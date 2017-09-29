@@ -124,9 +124,9 @@ gulp.task('rollup:src', function () {
 	return runRollup(
 		srcOpts.outJsPath + '/**/*.js',
 		{
-			entry: srcOpts.outJsPath + '/typemoq.js',
-			useStrict: false,
-			moduleName: 'TypeMoq',
+			input: srcOpts.outJsPath + '/typemoq.js',
+			strict: false,
+			name: 'TypeMoq',
 			globals: {
 				'circular-json': 'CircularJSON',
 				lodash: '_'
@@ -148,9 +148,9 @@ gulp.task('rollup:test', function () {
 	return runRollup(
 		testOpts.outJsPath + '/**/*.js',
 		{
-			entry: [ testOpts.outJsPath + '/Mock.test.js', testOpts.outJsPath + '/GlobalMock.test.js' ],
-			useStrict: true,
-			moduleName: 'TypeMoqTests',
+			input: [ testOpts.outJsPath + '/Mock.test.js', testOpts.outJsPath + '/GlobalMock.test.js' ],
+			strict: true,
+			name: 'TypeMoqTests',
 			globals: {
 				typemoq: 'TypeMoq',
 				chai: 'chai',
@@ -173,9 +173,9 @@ gulp.task('rollup:test.es6', function () {
 	return runRollup(
 		testES6Opts.outJsPath + '/**/*.js',
 		{
-			entry: [ testES6Opts.outJsPath + '/Mock.test.js', testES6Opts.outJsPath + '/GlobalMock.test.js' ],
-			useStrict: true,
-			moduleName: 'TypeMoqTests',
+			input: [ testES6Opts.outJsPath + '/Mock.test.js', testES6Opts.outJsPath + '/GlobalMock.test.js' ],
+			strict: true,
+			name: 'TypeMoqTests',
 			globals: {
 				typemoq: 'TypeMoq',
 				chai: 'chai',
@@ -190,11 +190,11 @@ function runRollup(srcPath, rollupOpts, destPath) {
 	return gulp.src(srcPath)
     	.pipe($.sourcemaps.init({loadMaps: true}))
 		.pipe($.rollup({
-        	entry: rollupOpts.entry,
-			sourceMap: true,
-			useStrict: rollupOpts.useStrict,
+        	input: rollupOpts.input,
+			sourcemap: true,
+			strict: rollupOpts.strict,
 			format: 'umd',
-			moduleName: rollupOpts.moduleName,
+			name: rollupOpts.name,
 			globals: rollupOpts.globals
       	}))
     	.pipe($.sourcemaps.write('.'))

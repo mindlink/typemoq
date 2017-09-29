@@ -28,22 +28,14 @@ export abstract class BaseInvocation implements ICallContext {
 }
 
 export class MethodInvocation extends BaseInvocation {
-    private _args: IArguments;
-
     constructor(
         private readonly _that: Object,
         private readonly _property: MethodInfo,
-        args?: IArguments,
+        private _args?: IArguments,
         proxyType = ProxyType.STATIC,
         callType = CallType.FUNCTION) {
 
         super(proxyType, callType);
-
-        if (args) {
-            this._args = <any>_.cloneDeep(args);
-            this._args.length = args.length;
-            this._args.callee = args.callee;
-        }
     }
 
     get args(): IArguments { return this._args || <any>{ length: 0, callee: null }; }
@@ -52,11 +44,8 @@ export class MethodInvocation extends BaseInvocation {
     get property(): IPropertyInfo { return this._property; }
 
     invokeBase(): void {
-        let thatClone = {};
-        if (this._that)
-            common.Utils.clone(thatClone, this._that);
-        else
-            thatClone = this._property.obj;
+        let thatClone = this._that || this._property.obj;
+
         this.returnValue = this._property.toFunc.apply(thatClone, this._args);
     }
 
@@ -75,7 +64,7 @@ export class ValueGetterInvocation extends BaseInvocation {
 
         super(proxyType, callType);
 
-        this.returnValue = _.cloneDeep(value);
+        this.returnValue = value;
     }
 
     get args(): IArguments {
@@ -105,7 +94,7 @@ export class DynamicGetInvocation extends ValueGetterInvocation {
 
         super(property, value, ProxyType.DYNAMIC, CallType.UNKNOWN);
 
-        this.returnValue = _.cloneDeep(value);
+        this.returnValue = value;
     }
 }
 
@@ -120,9 +109,7 @@ export class ValueSetterInvocation extends BaseInvocation {
 
         super(proxyType, callType);
 
-        this._args = <any>_.cloneDeep(args);
-        this._args.length = args.length;
-        this._args.callee = args.callee;
+        this._args = args;
     }
 
     get args(): IArguments { return this._args; }
@@ -183,9 +170,7 @@ export class MethodSetterInvocation extends BaseInvocation {
 
         super(proxyType, callType);
 
-        this._args = <any>_.cloneDeep(args);
-        this._args.length = args.length;
-        this._args.callee = args.callee;
+        this._args = args;
     }
 
     get args(): IArguments { return this._args; }
@@ -213,7 +198,7 @@ export class MethodInfo implements IPropertyInfo {
         desc?: common.PropDescriptor) {
 
         if (desc)
-            this.desc = _.cloneDeep(desc);
+            this.desc = desc;
     }
 
     get toFunc(): Function {
@@ -237,7 +222,7 @@ export class PropertyInfo implements IPropertyInfo {
         desc?: common.PropDescriptor) {
 
         if (desc)
-            this.desc = _.cloneDeep(desc);
+            this.desc = desc;
     }
 
     toString(): string {

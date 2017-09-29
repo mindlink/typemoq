@@ -14,7 +14,7 @@ export class AddActualInvocation<T> implements IInterceptStrategy<T> {
 export class ExtractProxyCall<T> implements IInterceptStrategy<T> {
 
     handleIntercept(invocation: all.ICallContext, ctx: InterceptorContext<T>, localCtx: CurrentInterceptContext<T>): InterceptionAction {
-        let expectedCalls = ctx.expectedCalls().slice();
+        let expectedCalls = ctx.expectedCalls().slice().reverse();
 
         let findCallPred = <T>(c: all.IProxyCall<T>) => c.matches(invocation);
 
@@ -22,13 +22,7 @@ export class ExtractProxyCall<T> implements IInterceptStrategy<T> {
             return findCallPred(c);
         });
 
-        if (matchingCalls.length > 1)   // record/replay scenario 
-            findCallPred = <T>(c: all.IProxyCall<T>) => !c.isInvoked &&
-                c.matches(invocation);
-
-        localCtx.call = _.find(expectedCalls, (c: all.IProxyCall<T>) => {
-            return findCallPred(c);
-        });
+        localCtx.call = matchingCalls[0];
         
         if (localCtx.call != null) {
             // determine call type for dynamic mock at execution
